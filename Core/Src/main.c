@@ -108,7 +108,15 @@ int main(void)
   MX_USART3_UART_Init();
   MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
-
+//  TIM_OC_InitTypeDef sConfigOC = { 0 };
+//	sConfigOC.OCMode = TIM_OCMODE_PWM1;
+//	sConfigOC.Pulse = (uint16_t) (__HAL_TIM_GET_AUTORELOAD(&htim4)) ;
+//	sConfigOC.OCPolarity = TIM_OCPOLARITY_LOW;
+//	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+//	if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC,TIM_CHANNEL_4) != HAL_OK) {
+//		Error_Handler();
+//	}
+//	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -120,6 +128,7 @@ int main(void)
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
   while (1)
   {
     /* USER CODE END WHILE */

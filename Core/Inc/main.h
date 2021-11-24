@@ -80,8 +80,6 @@ void Error_Handler(void);
 #define ALERT0_TMP275_GPIO_Port GPIOE
 #define ALERT4_TMP275_Pin GPIO_PIN_6
 #define ALERT4_TMP275_GPIO_Port GPIOE
-#define DISP_LEDA_Pin GPIO_PIN_9
-#define DISP_LEDA_GPIO_Port GPIOB
 #define DISP_CS_Pin GPIO_PIN_7
 #define DISP_CS_GPIO_Port GPIOB
 #define BTN5_Pin GPIO_PIN_6

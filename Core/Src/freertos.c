@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "tim.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,6 +55,18 @@ const osThreadAttr_t defaultTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for backlight */
+osThreadId_t backlightHandle;
+const osThreadAttr_t backlight_attributes = {
+  .name = "backlight",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for backlight_value */
+osMessageQueueId_t backlight_valueHandle;
+const osMessageQueueAttr_t backlight_value_attributes = {
+  .name = "backlight_value"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -62,6 +74,7 @@ const osThreadAttr_t defaultTask_attributes = {
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
+void backlightTask(void *argument);
 
 extern void MX_USB_DEVICE_Init(void);
 extern void MX_USB_HOST_Init(void);
@@ -90,6 +103,10 @@ void MX_FREERTOS_Init(void) {
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
+  /* Create the queue(s) */
+  /* creation of backlight_value */
+  backlight_valueHandle = osMessageQueueNew (20, sizeof(uint16_t), &backlight_value_attributes);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -97,6 +114,9 @@ void MX_FREERTOS_Init(void) {
   /* Create the thread(s) */
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+
+  /* creation of backlight */
+  backlightHandle = osThreadNew(backlightTask, NULL, &backlight_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -127,11 +147,45 @@ void StartDefaultTask(void *argument)
   MX_LWIP_Init();
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
+  int16_t desiredbrightness= 0;
+  int16_t direction=1;
   for(;;)
   {
-    osDelay(1);
+	  desiredbrightness+=direction;
+	  if(desiredbrightness>80) direction=-1;
+	  if(desiredbrightness==20) direction=1;
+	  osMessageQueuePut(backlight_valueHandle, (void *)&desiredbrightness, 0, osWaitForever);
+	  osDelay(10);
   }
   /* USER CODE END StartDefaultTask */
+}
+
+/* USER CODE BEGIN Header_backlightTask */
+/**
+* @brief Function implementing the backlight thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_backlightTask */
+void backlightTask(void *argument)
+{
+  /* USER CODE BEGIN backlightTask */
+  /* Infinite loop */
+	osStatus_t status;
+	uint16_t backlight_value;
+	uint16_t pulse_width;
+  for(;;)
+  {
+	  status=osMessageQueueGet(backlight_valueHandle,(uint16_t *) &backlight_value,NULL, osWaitForever);
+	  if(status==osOK)
+	  {
+		  pulse_width=(uint16_t) (__HAL_TIM_GET_AUTORELOAD(&htim4)* backlight_value) / 100;
+			__HAL_TIM_SET_COMPARE(&htim4,TIM_CHANNEL_4,pulse_width);
+			HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+	  }
+    osDelay(1);
+  }
+  /* USER CODE END backlightTask */
 }
 
 /* Private application code --------------------------------------------------*/
