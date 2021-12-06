@@ -23,7 +23,6 @@
 #include "dma.h"
 #include "fatfs.h"
 #include "i2c.h"
-#include "iwdg.h"
 #include "lwip.h"
 #include "rtc.h"
 #include "sdio.h"
@@ -106,7 +105,6 @@ int main(void)
   MX_FATFS_Init();
   MX_USART2_UART_Init();
   MX_USART3_UART_Init();
-  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
 //  TIM_OC_InitTypeDef sConfigOC = { 0 };
 //	sConfigOC.OCMode = TIM_OCMODE_PWM1;
@@ -119,8 +117,7 @@ int main(void)
 //	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
   /* USER CODE END 2 */
 
-  /* Init scheduler */
-  osKernelInitialize();  /* Call init function for freertos objects (in freertos.c) */
+  /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init();
   /* Start scheduler */
   osKernelStart();
@@ -154,11 +151,9 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE
-                              |RCC_OSCILLATORTYPE_LSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE|RCC_OSCILLATORTYPE_LSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.LSEState = RCC_LSE_ON;
-  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 25;
