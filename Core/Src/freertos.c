@@ -29,6 +29,7 @@
 #include "tim.h"
 #include "lwip.h"
 #include "api.h"
+#include "httpserver-netconn.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -122,13 +123,16 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of backlight */
-  osThreadDef(backlight, backlightTask, osPriorityLow, 0, 128);
+  osThreadDef(backlight, backlightTask, osPriorityLow, 0, 256);
   backlightHandle = osThreadCreate(osThread(backlight), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-  osThreadDef(tcpclientTask,StarttcpclientTask,osPriorityBelowNormal,0,256);
-    tcpclientHandle = osThreadCreate(osThread(tcpclientTask), NULL);
+//  osThreadDef(tcpclientTask,StarttcpclientTask,osPriorityBelowNormal,0,256);
+//    tcpclientHandle = osThreadCreate(osThread(tcpclientTask), NULL);
+  osThreadDef(httpTask,http_server_netconn_thread,osPriorityBelowNormal,0,DEFAULT_THREAD_STACKSIZE);
+  osThreadCreate(osThread(httpTask), NULL);
+
   /* USER CODE END RTOS_THREADS */
 
 }
@@ -152,6 +156,7 @@ void StartDefaultTask(void const * argument)
   MX_LWIP_Init();
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
+//  http_server_netconn_init();
   printf("StartDefaultTask\n\r");
   int16_t desiredbrightness=10;
   int16_t direction=1;
@@ -220,7 +225,7 @@ void StarttcpclientTask(void const *argument)
 	local_ip=gnetif.ip_addr;
 	printf("Assigned IP:%s\n\r",ip4addr_ntoa(&local_ip));
 
-	ip4addr_aton("192.168.1.213",&remote_ip);
+	ip4addr_aton("192.168.1.11",&remote_ip);
 	nc=netconn_new(NETCONN_TCP);
 	if(nc==NULL){
 		printf("new Connection Error!\r\n");
@@ -233,7 +238,7 @@ void StarttcpclientTask(void const *argument)
 	}
 	osDelay(20000);
 
-	while((res=netconn_connect(nc,&remote_ip,7))!=ERR_OK)
+	while((res=netconn_connect(nc,&remote_ip,17))!=ERR_OK)
 	{
 		printf("connect to Connection Error,%d!\r\n",res);
 		osDelay(2000);

@@ -106,15 +106,10 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-//  TIM_OC_InitTypeDef sConfigOC = { 0 };
-//	sConfigOC.OCMode = TIM_OCMODE_PWM1;
-//	sConfigOC.Pulse = (uint16_t) (__HAL_TIM_GET_AUTORELOAD(&htim4)) ;
-//	sConfigOC.OCPolarity = TIM_OCPOLARITY_LOW;
-//	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-//	if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC,TIM_CHANNEL_4) != HAL_OK) {
-//		Error_Handler();
-//	}
-//	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+  HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_RESET);
+  HAL_Delay(10);
+  HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_SET);
+
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */

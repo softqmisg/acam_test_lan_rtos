@@ -90,6 +90,8 @@ void Error_Handler(void);
 #define uSD_Detect_GPIO_Port GPIOD
 #define ESP32_EN_Pin GPIO_PIN_4
 #define ESP32_EN_GPIO_Port GPIOD
+#define ETH_RESET_Pin GPIO_PIN_0
+#define ETH_RESET_GPIO_Port GPIOA
 #define TEC_ONOFF_Pin GPIO_PIN_13
 #define TEC_ONOFF_GPIO_Port GPIOF
 #define TEC_CURDIR_Pin GPIO_PIN_12
